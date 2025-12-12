@@ -1,0 +1,89 @@
+:root {
+  --bg: #0b0b0d;
+  --text: #e6e6f0;
+  --primary: #00e5ff;
+  --danger: #ff3b6b;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: radial-gradient(1200px 600px at 80% 10%, #121421 0%, var(--bg) 45%) fixed;
+  color: var(--text);
+  font-family: "Inter","Noto Sans JP",sans-serif;
+  overflow: hidden;
+}
+
+.card {
+  position: relative;
+  z-index: 2;
+  width: min(880px, 92vw);
+  margin: 12vh auto;
+  padding: 40px;
+  background: rgba(19,21,28,0.7);
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 24px;
+  text-shadow: 0 0 10px rgba(0,229,255,.35);
+}
+
+/* メッセージステージ */
+.stage { display: none; margin-top: 20px; }
+.stage.active { display: block; }
+.msg-wrap {
+  min-height: 160px;
+  padding: 24px;
+  border-radius: 16px;
+  background: rgba(20,22,30,0.6);
+  border: 1px solid #2b2e3b;
+}
+.msg {
+  font-size: 20px;
+  font-weight: 600;
+  white-space: pre-wrap;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.msg.show { opacity: 1; transform: translateY(0); }
+.hint { margin-top: 12px; font-size: 14px; text-align: center; }
+.key {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #0c1016;
+  border: 1px solid #2b2e3b;
+  color: #cfd2e6;
+  font-weight: bold;
+}
+
+/* ロゴ演出 */
+.logo-scene {
+  position: fixed;
+  inset: 0;
+  background: black;
+  display: grid;
+  place-items: center;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
+}
+.logo-scene.show { opacity: 1; pointer-events: auto; }
+.logo {
+  width: 300px;
+  height: auto;
+  animation: logoFade 2.4s ease forwards;
+}
+@keyframes logoFade {
+  0% { transform: scale(0.8); opacity: 0; }
+  40% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1.05); opacity: 1; }
+}

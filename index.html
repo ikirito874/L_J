@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ikuma Birthday — Black Neo</title>
+  <!-- 外部CSSを読み込み -->
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ----- Base ----- */
+    :root {
+      --bg: #0b0b0d;
+      --bg-2: #0f1117;
+      --text: #e6e6f0;
+      --muted: #a9a9b8;
+      --primary: #00e5ff;
+      --accent: #9d6cff;
+      --danger: #ff3b6b;
+      --card: #13151c;
+      --border: #222431;
+      --shadow: 0 10px 40px rgba(0,0,0,.45);
+      --glow: 0 0 16px rgba(0,229,255,.35), 0 0 32px rgba(0,229,255,.15);
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: radial-gradient(1200px 600px at 80% 10%, #121421 0%, var(--bg) 45%) fixed;
+      color: var(--text);
+      font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans JP", Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    /* ----- Canvas particles ----- */
+    canvas#bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      filter: blur(0.5px) contrast(110%);
+      opacity: .35;
+    }
+
+    /* ----- Grid backdrop lines ----- */
+    .grid {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(transparent 95%, rgba(255,255,255,.05) 100%) 0 0/ 100% 24px,
+        linear-gradient(90deg, transparent 95%, rgba(255,255,255,.05) 100%) 0 0/ 24px 100%;
+      mask-image: radial-gradient(800px 800px at 70% 30%, rgba(0,0,0,.8), transparent 70%);
+      pointer-events: none;
+    }
+
+    /* ----- Glass card ----- */
+    .card {
+      position: relative;
+      z-index: 2;
+      width: min(880px, 92vw);
+      margin: 12vh auto;
+      padding: clamp(24px, 4vw, 40px);
+      background: linear-gradient(180deg, rgba(19,21,28,.8), rgba(19,21,28,.55));
+      backdrop-filter: blur(8px) saturate(110%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    /* ----- Heading ----- */
+    .title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin: 0 0 8px;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+    .title .brand {
+      font-size: clamp(28px, 6vw, 48px);
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 10px rgba(0,229,255,.35);
+      filter: drop-shadow(0 2px 8px rgba(0,229,255,.18));
+    }
+    .title .sub {
+      font-size: clamp(14px, 2.4vw, 18px);
+      color: var(--muted);
+    }
+
+    /* ----- Divider line ----- */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #2b2e3b 50%, transparent);
+      margin: 16px 0 24px;
+      border-radius: 1px;
+    }
+
+    /* ----- Password gate ----- */
+    .gate {
+      display: grid;
+      gap: 16px;
+      padding: 18px;
+      border: 1px dashed #2a2d3a;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(13,15,22,.7), rgba(13,15,22,.5));
+    }
+    .gate h2 {
+      margin: 0;
+      font-size: clamp(18px, 3.4vw, 22px);
+      color: #cfd2e6;
+      font-weight: 700;
+    }
+    .gate .desc {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .gate form {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .input {
+      flex: 1 1 240px;
+      position: relative;
+    }
+    .input input {
+      width: 100%;
+      padding: 14px 44px 14px 14px;
+      border-radius: 12px;
+      border: 1px solid #2b2e3b;
+      outline: none;
+      background: #0e1118;
+      color: var(--text);
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .input input:focus {
+      border-color: #3a3f54;
+      box-shadow: var(--glow);
+    }
+    .input .eye {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: 1px solid #2b2e3b;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      color: #8aa3ad;
+      background: #0c1016;
+    }
+    .btn {
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid #2b2e3b;
+      color: var(--text);
+      background: radial-gradient(120% 120% at 20% 20%, #121424 0%, #0b0d13 55%);
+      cursor: pointer;
+      transition: transform .08s ease, box-shadow .2s ease, border-color .15s ease;
+    }
+    .btn.primary {
+      border-color: #284b55;
+      background:
+        linear-gradient(180deg, rgba(0,229,255,.10), rgba(0,229,255,.03)),
+        radial-gradient(150% 120% at 0% 0%, #0f121c 0%, #0b0d13 60%);
+      box-shadow: var(--glow);
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .error {
+      color: var(--danger);
+      font-size: 13px;
+      min-height: 18px;
+    }
+
+    /* ----- Message stage ----- */
+    .stage {
+      display: none;
+      margin-top: 8px;
+    }
+    .stage.active { display: block; }
+
+    .msg-wrap {
+      position: relative;
+      min-height: 140px;
+      border: 1px solid #2b2e3b;
+      border-radius: 16px;
+      padding: clamp(18px, 4vw, 26px);
+      background:
+        linear-gradient(180deg, rgba(20,22,30,.75), rgba(20,22,30,.55)),
+        radial-gradient(800px 360px at 50% 0%, rgba(0,229,255,.08), transparent 65%);
+      overflow: hidden;
+    }
+
+    .msg {
+      font-size: clamp(18px, 3.8vw, 26px);
+      font-weight: 700;
+      letter-spacing: .4px;
+      opacity: 0;
+      transform: translateY(8px) scale(.98);
+      filter: drop-shadow(0 2px 16px rgba(0, 229, 255, .08));
+      transition: opacity .5s ease, transform .5s ease;
+      white-space: pre-wrap;
+    }
+    .msg.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .hint {
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .hint .key {
+      display: inline-block;
+      border: 1px solid #2b2e3b;
+      border-bottom-color: #394057;
+      background: #0c1016;
+      padding: 6px 10px;
+      border-radius: 8px;
+      color: #cfd2e6;
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,.04);
+      font-weight: 700;
+    }
+    
+
+    /* ----- Neon underline animation ----- */
+    .underline {
+      position: relative;
+      display: inline-block;
+    }
+    .underline::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      box-shadow: 0 0 10px rgba(0,229,255,.35);
+      animation: scan 2.2s ease-in-out infinite;
+    }
+    @keyframes scan {
+      0% { transform: scaleX(0); opacity: .6; }
+      40% { transform: scaleX(1); opacity: 1; }
+      100% { transform: scaleX(0); opacity: .6; }
+    }
+
+    /* ----- Footer ----- */
+    .footer {
+      margin-top: 20px;
+      color: #8e90a3;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .footer .sig {
+      opacity: .9;
+    }
+    .social {
+      display: flex;
+      gap: 10px;
+    }
+    .social a {
+      color: #adb0c7;
+      text-decoration: none;
+      padding: 6px 10px;
+      border: 1px solid #2b2e3b;
+      border-radius: 8px;
+      background: #0c1016;
+      transition: color .2s, border-color .2s;
+    }
+    .social a:hover {
+      color: var(--text);
+      border-color: #3a3f54;
+    }
+
+    /* ----- Responsive tweaks ----- */
+    @media (max-width: 480px) {
+      .card { margin: 8vh auto; }
+      .hint { font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated particles background -->
+  <canvas id="bg"></canvas>
+  <div class="grid"></div>
+
+  <main class="card" role="main" aria-label="Ikuma birthday page">
+    <h1 class="title">
+        <span class="brand">Ikuma Birthday</span>
+    </h1>
+
+
+    <div class="divider" aria-hidden="true"></div>
+
+    <!-- Password Gate -->
+    <section class="gate" id="gate" aria-label="Password gate">
+      <h2>セキュリティクリアランスレベル5のパスワードを要求。入力して下さい。</h2>
+      <p class="desc">認証後、メッセージが再生されます。</p>
+      <form id="gateForm" autocomplete="off">
+        <div class="input">
+          <input
+            id="pw"
+            name="pw"
+            type="password"
+            inputmode="text"
+            placeholder="Password"
+            aria-label="Password"
+            required
+          />
+          <button type="button" class="eye" id="togglePw" aria-label="Show or hide password">👁️</button>
+        </div>
+        <button class="btn primary" type="submit" aria-label="Enter">入室</button>
+        <div class="error" id="error" role="alert" aria-live="polite"></div>
+      </form>
+    </section>
+
+    <!-- Stage -->
+    <section class="stage" id="stage" aria-label="Message stage">
+      <div class="msg-wrap">
+        <div class="msg" id="msg" aria-live="polite"></div>
+      </div>
+      <div class="hint">
+        <span class="key">Enter</span> を押すと次のメッセージへ進みます
+      </div>
+    </section>
+  </main>
+  <!-- ロゴ演出 -->
+  <div id="logoScene" class="logo-scene">
+    <img src="Copilot_20251212_123703.png" alt="Ikuma Birthday Logo" class="logo" />
+  </div>
+  <script>
+    // ---------- Config ----------
+    const PASSWORD = "ikuma2025"; // ここでパスワードを変更できます
+    const messages = [
+      "いくまさん、誕生日おめでとう！",
+      "あなたと出会うことが出来て僕はホンマに幸せです。",
+      "あなたのおかげで沢山の良い人達と出会えました。",
+      "...正直、いくまさんと出会った時期、リアルでつらいことがいっぱいありました。",
+      "でもあなたのおかげで、あなたと出会い知り合った人達のおかげでそんなこと忘れるぐらいに沢山笑って...幸せな気持ちになれました...",
+      "ホンマにありがとう！！心から感謝してます！！",
+      "...ちなみに...これ書いてる最中めっちゃ泣いてましたwww",
+      "僕にはこんなことしか出来ひんけど...喜んでもらえるととっても嬉しいです！！",
+      "..................",
+      "...そろそろ恥ずかしすぎてやばいから終わるね！！",
+      "普段こんなことせんからさwww",
+      "改めていくまさんお誕生日おめでとう！！",
+      "あなたにとっての1年が今年も良い年になりますように..."
+    ];
+    const typingSpeed = 18; // 文字描画のスピード
+
+    // ---------- Elements ----------
+    const gate = document.getElementById("gate");
+    const stage = document.getElementById("stage");
+    const form = document.getElementById("gateForm");
+    const pw = document.getElementById("pw");
+    const err = document.getElementById("error");
+    const msgEl = document.getElementById("msg");
+    const togglePw = document.getElementById("togglePw");
+    const logoScene = document.getElementById("logoScene");
+    const mainCard = document.querySelector("main"); // ★追加: メインのカード要素
+
+    // ---------- Password toggle ----------
+    togglePw.addEventListener("click", () => {
+      pw.type = pw.type === "password" ? "text" : "password";
+      togglePw.textContent = pw.type === "password" ? "👁️" : "🙈";
+      pw.focus();
+    });
+
+    // ---------- Gate submit ----------
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const ok = pw.value.trim() === PASSWORD;
+      if (!ok) {
+        err.textContent = "キーが違います。もう一度試してください。";
+        shake(err);
+        pulseBorder(gate);
+        return;
+      }
+      err.textContent = "";
+      revealStage();
+    });
+
+    // ---------- Stage / messages ----------
+    let index = 0;
+    let typingTimer = null;
+
+    function revealStage() {
+      gate.style.display = "none";
+      stage.classList.add("active");
+      showMessage(messages[index]);
+      document.addEventListener("keydown", onKey);
+    }
+
+    function onKey(e) {
+      if (e.key === "Enter") {
+        e.preventDefault(); // Enterキーによる予期せぬ動作を防止
+        if (typingTimer) {
+          // タイピング中は即座に全文表示
+          clearInterval(typingTimer);
+          msgEl.textContent = messages[index];
+          typingTimer = null;
+        } else if (index < messages.length - 1) {
+          // 次のメッセージへ
+          index++;
+          showMessage(messages[index]);
+        } else {
+          // 最後のメッセージ表示後にEnterが押されたらロゴ演出へ
+          triggerLogoScene();
+        }
+      }
+    }
+
+    function triggerLogoScene() {
+      document.removeEventListener("keydown", onKey);
+      mainCard.style.display = "none"; // ★修正: メインカードを非表示
+      logoScene.classList.add("show");
+    }
+
+
+    function showMessage(text) {
+      if (typingTimer) {
+        clearInterval(typingTimer);
+        typingTimer = null;
+      }
+      msgEl.classList.remove("show");
+      msgEl.textContent = "";
+      // typewriter effect
+      const chars = [...text];
+      let i = 0;
+      typingTimer = setInterval(() => {
+        msgEl.textContent += chars[i++];
+        if (i >= chars.length) {
+          clearInterval(typingTimer);
+          typingTimer = null;
+        }
+      }, Math.max(8, 1000 / typingSpeed));
+      requestAnimationFrame(() => {
+        msgEl.classList.add("show");
+      });
+    }
+
+    // ---------- Micro animations ----------
+    function shake(el) {
+      el.animate([
+        { transform: "translateX(0)" },
+        { transform: "translateX(-6px)" },
+        { transform: "translateX(6px)" },
+        { transform: "translateX(0)" }
+      ], { duration: 260, easing: "ease-out" });
+    }
+    function pulseBorder(el) {
+      el.animate([
+        { boxShadow: "0 0 0 rgba(255,59,107,0)" },
+        { boxShadow: "0 0 24px rgba(255,59,107,.35)" },
+        { boxShadow: "0 0 0 rgba(255,59,107,0)" }
+      ], { duration: 600, easing: "ease" });
+    }
+
+    // ---------- Particles background ----------
+    const c = document.getElementById("bg");
+    const ctx = c.getContext("2d");
+    let w, h, particles;
+    const PCOUNT = 60;
+    const COLORS = ["#00e5ff", "#9d6cff", "#77ffe1"];
+
+    function resize() {
+      w = c.width = window.innerWidth;
+      h = c.height = window.innerHeight;
+      initParticles();
+    }
+    window.addEventListener("resize", resize);
+    resize();
+
+    function initParticles() {
+      particles = Array.from({ length: PCOUNT }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
+        r: Math.random() * 2.4 + 0.6,
+        c: COLORS[Math.floor(Math.random() * COLORS.length)]
+      }));
+    }
+
+    function step() {
+      ctx.clearRect(0, 0, w, h);
+      // draw links
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const a = particles[i], b = particles[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < 140 * 140) {
+            const alpha = Math.max(0, 1 - d2 / (140 * 140));
+            ctx.strokeStyle = `rgba(120,140,160,${alpha * 0.18})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+      // draw particles
+      for (const p of particles) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+        g.addColorStop(0, p.c);
+        g.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      requestAnimationFrame(step);
+    }
+    step();
+  </script>
